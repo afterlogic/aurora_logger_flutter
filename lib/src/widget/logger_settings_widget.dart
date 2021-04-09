@@ -38,38 +38,40 @@ class _LoggerSettingWidgetState extends State<LoggerSettingWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        ListTile(
-          title: Text("Host: " + widget.arg.hostname),
-        ),
-        CheckboxListTile(
-          value: _debug,
-          title: Text(widget.arg.labelShowDebugView),
-          onChanged: (bool value) {
-            _debug = value;
-            _storage.setDebug(value);
-            setState(() {});
-            logger.enable = value;
-          },
-        ),
-        FlatButton(
-          child: Text(widget.arg.labelDeleteAllLogs),
-          onPressed: () async {
-            final result =
-                await widget.arg.confirmDialog(widget.arg.hintDeleteAllLogs);
-            if (result == true) {
-              deleteAll();
-            }
-          },
-        ),
-        Expanded(
-          child: ListView(
-            children: _logs,
-          ),
-        )
-      ],
-    );
+    return _debug == null
+        ? SizedBox.shrink()
+        : Column(
+            children: <Widget>[
+              ListTile(
+                title: Text("Host: " + widget.arg.hostname),
+              ),
+              CheckboxListTile(
+                value: _debug,
+                title: Text(widget.arg.labelShowDebugView),
+                onChanged: (bool value) {
+                  _debug = value;
+                  _storage.setDebug(value);
+                  setState(() {});
+                  logger.enable = value;
+                },
+              ),
+              FlatButton(
+                child: Text(widget.arg.labelDeleteAllLogs),
+                onPressed: () async {
+                  final result = await widget.arg
+                      .confirmDialog(widget.arg.hintDeleteAllLogs);
+                  if (result == true) {
+                    deleteAll();
+                  }
+                },
+              ),
+              Expanded(
+                child: ListView(
+                  children: _logs,
+                ),
+              )
+            ],
+          );
   }
 
   Future<List<Widget>> getLogs(String path) async {

@@ -8,7 +8,7 @@ import 'logger_storage.dart';
 
 Logger _logger;
 
-Logger get logger => _logger ?? Logger._();
+Logger get logger => _logger ??= Logger._();
 
 class Logger {
   String currentTag;

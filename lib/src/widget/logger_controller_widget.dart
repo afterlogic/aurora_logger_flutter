@@ -33,7 +33,11 @@ class LoggerControllerWidgetState extends State<LoggerControllerWidget> {
   }
 
   onChange() {
-    setState(() {});
+    try {
+      setState(() {});
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
