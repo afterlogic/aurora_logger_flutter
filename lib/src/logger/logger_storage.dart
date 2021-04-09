@@ -6,7 +6,7 @@ class LoggerStorage {
   LoggerStorage._();
 
   factory LoggerStorage() {
-    return _instance ??= LoggerStorage();
+    return _instance ??= LoggerStorage._();
   }
 
   Future<SharedPreferences> _getPref() async {

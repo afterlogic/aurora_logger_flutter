@@ -1,7 +1,6 @@
 class LoggerSettingArg {
   final String hostname;
   final String labelShowDebugView;
-  final String labelCounterOfUploadedMessage;
   final String labelDeleteAllLogs;
   final String hintDeleteAllLogs;
   final String hintDeleteLog;
@@ -10,7 +9,6 @@ class LoggerSettingArg {
   LoggerSettingArg(
     this.hostname,
     this.labelShowDebugView,
-    this.labelCounterOfUploadedMessage,
     this.labelDeleteAllLogs,
     this.hintDeleteAllLogs,
     this.hintDeleteLog,
