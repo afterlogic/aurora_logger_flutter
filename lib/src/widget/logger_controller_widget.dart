@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:aurora_logger/src/logger/logger.dart';
+import 'package:flutter/scheduler.dart';
 
 class LoggerControllerWidget extends StatefulWidget {
   @override
@@ -23,7 +24,7 @@ class LoggerControllerWidgetState extends State<LoggerControllerWidget> {
   @override
   void initState() {
     super.initState();
-    logger.onEdit = onChange;
+    logger.onEdit = _onChange;
   }
 
   @override
@@ -32,11 +33,37 @@ class LoggerControllerWidgetState extends State<LoggerControllerWidget> {
     logger.onEdit = null;
   }
 
-  onChange() {
+  void _rebuild() {
     try {
       setState(() {});
-    } catch (e) {
-      print(e);
+    } catch (err) {
+      print('LoggerControllerWidget ERROR: $err');
+    }
+  }
+
+  void _onChange() {
+    // if we are in the build phase
+    if (SchedulerBinding.instance.schedulerPhase ==
+        SchedulerPhase.persistentCallbacks) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        _rebuild();
+      });
+    } else {
+      _rebuild();
+    }
+  }
+
+  void _onDelete() {
+    logger.clear();
+  }
+
+  void _onStartPause() {
+    logger.isRun ? logger.pause() : logger.start();
+  }
+
+  void _onSave() {
+    if (logger.count > 0) {
+      logger.save();
     }
   }
 
@@ -63,10 +90,7 @@ class LoggerControllerWidgetState extends State<LoggerControllerWidget> {
                     padding: EdgeInsets.all(6),
                     child: Icon(Icons.delete),
                   ),
-                  onTap: () {
-                    logger.clear();
-                    setState(() {});
-                  },
+                  onTap: _onDelete,
                 ),
                 GestureDetector(
                   behavior: HitTestBehavior.opaque,
@@ -79,13 +103,7 @@ class LoggerControllerWidgetState extends State<LoggerControllerWidget> {
                       color: Colors.red,
                     ),
                   ),
-                  onTap: logger.isRun
-                      ? () {
-                          logger.pause();
-                        }
-                      : () {
-                          logger.start();
-                        },
+                  onTap: _onStartPause,
                 ),
                 GestureDetector(
                   behavior: HitTestBehavior.opaque,
@@ -93,16 +111,12 @@ class LoggerControllerWidgetState extends State<LoggerControllerWidget> {
                     padding: EdgeInsets.all(6),
                     child: Icon(Icons.save),
                   ),
-                  onTap: (logger?.count ?? 0) > 0
-                      ? () async {
-                          await logger.save();
-                        }
-                      : null,
+                  onTap: _onSave,
                 )
               ],
             ),
             Text(
-              "Recorded entries: " + logger.count.toString(),
+              "Recorded entries: ${logger.count}",
               style: TextStyle(
                 fontSize: 9,
                 color: Colors.black,
