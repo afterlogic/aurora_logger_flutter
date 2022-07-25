@@ -16,29 +16,32 @@ class LoggerSettingWidget extends StatefulWidget {
 
 class _LoggerSettingWidgetState extends State<LoggerSettingWidget> {
   final _storage = LoggerStorage();
-  bool _debug;
-  List<Widget> _logs;
+  late bool _debug;
+  late List<Widget> _logs;
+  bool _initComplete = false;
 
   @override
   void initState() {
     super.initState();
-    init();
+    _init();
   }
 
-  init() {
+  void _init() {
     Future.wait([
       _storage.getDebug(),
-      logger.logDir().then((value) => getLogs(value))
-    ]).then((value) {
-      _debug = (value[0] ?? false) as bool;
-      _logs = (value[1] ?? []) as List<Widget>;
-      setState(() {});
+      logger.logDir().then((value) => getLogs(value)),
+    ]).then((list) {
+      _debug = list[0] as bool;
+      _logs = list[1] as List<Widget>;
+      setState(() {
+        _initComplete = true;
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return _debug == null
+    return !_initComplete
         ? SizedBox.shrink()
         : Column(
             children: <Widget>[
@@ -48,22 +51,11 @@ class _LoggerSettingWidgetState extends State<LoggerSettingWidget> {
               CheckboxListTile(
                 value: _debug,
                 title: Text(widget.arg.labelShowDebugView),
-                onChanged: (bool value) {
-                  _debug = value;
-                  _storage.setDebug(value);
-                  setState(() {});
-                  logger.enable = value;
-                },
+                onChanged: _onChangeDebug,
               ),
-              FlatButton(
+              TextButton(
                 child: Text(widget.arg.labelDeleteAllLogs),
-                onPressed: () async {
-                  final result = await widget.arg
-                      .confirmDialog(widget.arg.hintDeleteAllLogs);
-                  if (result == true) {
-                    deleteAll();
-                  }
-                },
+                onPressed: _onDeleteAll,
               ),
               Expanded(
                 child: ListView(
@@ -72,6 +64,21 @@ class _LoggerSettingWidgetState extends State<LoggerSettingWidget> {
               )
             ],
           );
+  }
+
+  void _onChangeDebug(bool? value) {
+    final enable = value ?? false;
+    _debug = enable;
+    _storage.setDebug(enable);
+    setState(() {});
+    logger.enable = enable;
+  }
+
+  Future<void> _onDeleteAll() async {
+    final result = await widget.arg.confirmDialog(widget.arg.hintDeleteAllLogs);
+    if (result == true) {
+      deleteAll();
+    }
   }
 
   Future<List<Widget>> getLogs(String path) async {
@@ -85,8 +92,11 @@ class _LoggerSettingWidgetState extends State<LoggerSettingWidget> {
       final stat = await file.stat();
       statMap[file] = stat;
     }
-    files.sort((a, b) =>
-        a is Directory ? 0 : statMap[a].changed.compareTo(statMap[b].changed));
+    files.sort((a, b) {
+      if (a is Directory) return 0;
+      if (statMap[a] == null || statMap[b] == null) return 0;
+      return statMap[a]!.changed.compareTo(statMap[b]!.changed);
+    });
     final widgets = <Widget>[];
     for (var value in files) {
       if (value is Directory) {
@@ -102,7 +112,7 @@ class _LoggerSettingWidgetState extends State<LoggerSettingWidget> {
   deleteAll() async {
     final dir = Directory(await logger.logDir());
     await _delete(dir);
-    init();
+    _init();
   }
 
   Future _delete(FileSystemEntity entity) async {
@@ -118,7 +128,7 @@ class _LoggerSettingWidgetState extends State<LoggerSettingWidget> {
 
   delete(File file) async {
     await file.delete();
-    init();
+    _init();
   }
 }
 

@@ -43,9 +43,9 @@ class LoggerControllerWidgetState extends State<LoggerControllerWidget> {
 
   void _onChange() {
     // if we are in the build phase
-    if (SchedulerBinding.instance.schedulerPhase ==
+    if (SchedulerBinding.instance?.schedulerPhase ==
         SchedulerPhase.persistentCallbacks) {
-      SchedulerBinding.instance.addPostFrameCallback((_) {
+      SchedulerBinding.instance?.addPostFrameCallback((_) {
         _rebuild();
       });
     } else {

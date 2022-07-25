@@ -1,7 +1,7 @@
 class LoggerApiInterceptor {
-  void Function(String) onError;
-  void Function(String) onRequest;
-  void Function(String) onResponse;
+  void Function(String)? onError;
+  void Function(String)? onRequest;
+  void Function(String)? onResponse;
 
   void error(String msg) {
     onError?.call(msg);

@@ -6,35 +6,38 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'logger_storage.dart';
 
-Logger _logger;
+Logger? _logger;
 
 Logger get logger => _logger ??= Logger._();
 
 class Logger {
-  String currentTag;
+  static const newLine = "|/n|";
+
   final storage = LoggerStorage();
+  String? currentTag;
+  String buffer = "";
+  int count = 0;
+  Function()? onEdit;
+
   bool _isRun = false;
+
+  bool get isRun => _isRun;
 
   set isRun(bool val) {
     storage.setIsRun(val);
     _isRun = val;
   }
 
-  bool get isRun => _isRun;
   bool _enable = false;
 
   bool get enable => _enable;
 
   set enable(bool v) {
     _enable = v;
-    if (onEdit != null) onEdit();
+    if (onEdit != null) onEdit!.call();
   }
 
-  String buffer = "";
-  int count = 0;
-  Function onEdit;
-
-  Logger._([String tag, LoggerApiInterceptor apiInterceptor]) {
+  Logger._([String? tag, LoggerApiInterceptor? apiInterceptor]) {
     currentTag = tag;
     if (apiInterceptor == null) {
       apiInterceptor = LoggerSetting.current.defaultInterceptor;
@@ -52,7 +55,7 @@ class Logger {
     }
   }
 
-  error(Object text, StackTrace stackTrace, [bool show = true]) {
+  void error(Object text, StackTrace? stackTrace, [bool show = true]) {
     stackTrace ??= StackTrace.current;
     final time = DateFormat("hh:mm:ss.SSS").format(DateTime.now());
     text =
@@ -61,17 +64,17 @@ class Logger {
     if (isRun) {
       buffer += "[$time] ${"$text".replaceAll("\n", newLine)}$newLine$newLine";
       count++;
-      if (onEdit != null) onEdit();
+      if (onEdit != null) onEdit!.call();
     }
   }
 
-  log(Object text, [bool show = true]) {
+  void log(Object text, [bool show = true]) {
     final time = DateFormat("hh:mm:ss.SSS").format(DateTime.now());
     if (show == true) print("[$time] $text");
     if (isRun) {
       buffer += "[$time] ${"$text".replaceAll("\n", newLine)}$newLine$newLine";
       count++;
-      if (onEdit != null) onEdit();
+      if (onEdit != null) onEdit!.call();
     }
   }
 
@@ -79,39 +82,39 @@ class Logger {
     return Logger._("Background_sync", apiInterceptor);
   }
 
-  static errorLog(Object error, StackTrace stackTrace) {
+  static Logger errorLog(Object error, StackTrace stackTrace) {
     return Logger._("Error")
       ..start()
       ..error(error, stackTrace)
       ..save();
   }
 
-  static notifications(Object value) {
+  static Logger notifications(Object value) {
     return Logger._("Notifications")
       ..start()
       ..log(value)
       ..save();
   }
 
-  static fido(Object value) {
+  static Logger fido(Object value) {
     return Logger._("FIDO")
       ..start()
       ..log(value)
       ..save();
   }
 
-  start() {
+  void start() {
     isRun = true;
-    if (onEdit != null) onEdit();
+    if (onEdit != null) onEdit!.call();
   }
 
-  clear() {
+  void clear() {
     buffer = "";
     count = 0;
-    if (onEdit != null) onEdit();
+    if (onEdit != null) onEdit!.call();
   }
 
-  save() async {
+  Future<void> save() async {
     final content = buffer;
     buffer = "";
     count = 0;
@@ -130,12 +133,12 @@ class Logger {
       print(e);
     }
 
-    if (onEdit != null) onEdit();
+    if (onEdit != null) onEdit!.call();
   }
 
-  pause() {
+  void pause() {
     isRun = false;
-    if (onEdit != null) onEdit();
+    if (onEdit != null) onEdit!.call();
   }
 
   Future<String> logDir() async {
@@ -143,6 +146,4 @@ class Logger {
         Platform.pathSeparator +
         "Logs_${LoggerSetting.current.packageName}";
   }
-
-  static const newLine = "|/n|";
 }

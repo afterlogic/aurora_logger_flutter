@@ -1,8 +1,9 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoggerStorage {
-  static LoggerStorage _instance;
-  SharedPreferences _pref;
+  static LoggerStorage? _instance;
+  SharedPreferences? _pref;
+
   LoggerStorage._();
 
   factory LoggerStorage() {

@@ -1,12 +1,9 @@
 name: aurora_logger
 description: A new Flutter project.
-version: 0.0.2
-author:
-homepage:
+version: 0.0.3
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
-  flutter: ">=1.17.0"
+  sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -15,6 +12,7 @@ dependencies:
   path_provider:
   intl:
   share:
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

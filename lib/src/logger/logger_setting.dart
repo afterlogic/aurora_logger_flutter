@@ -2,7 +2,7 @@ import 'package:aurora_logger/src/interceptor/logger_api_interceptor.dart';
 
 class LoggerSetting {
   final String packageName;
-  final LoggerApiInterceptor defaultInterceptor;
+  final LoggerApiInterceptor? defaultInterceptor;
 
   LoggerSetting({
     this.packageName = "packageName",
