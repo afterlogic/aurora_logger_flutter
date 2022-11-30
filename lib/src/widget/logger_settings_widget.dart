@@ -86,7 +86,7 @@ class _LoggerSettingWidgetState extends State<LoggerSettingWidget> {
     if (!await dir.exists()) {
       return [];
     }
-    var files = (await (await dir.list()).toList());
+    var files = (await (dir.list()).toList());
     Map<FileSystemEntity, FileStat> statMap = {};
     for (var file in files) {
       final stat = await file.stat();

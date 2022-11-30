@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:aurora_logger/src/widget/logger_setting_arg.dart';
 import 'package:flutter/material.dart';
-import 'package:share/share.dart';
+import 'package:share_plus/share_plus.dart';
 
 class LogScreen extends StatelessWidget {
   final File file;
@@ -20,9 +20,9 @@ class LogScreen extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.share),
             onPressed: () {
-              Share.shareFiles(
-                [file.path],
-                mimeTypes: ['text/plain'],
+              final xFile = XFile(file.path, mimeType: 'text/plain');
+              Share.shareXFiles(
+                [xFile],
                 subject: file.path.split(Platform.pathSeparator).last,
                 sharePositionOrigin: Rect.fromCenter(
                   center: MediaQuery.of(context).size.bottomCenter(Offset.zero),
@@ -35,8 +35,7 @@ class LogScreen extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.delete),
             onPressed: () async {
-              final result =
-                  await arg.confirmDialog(arg.hintDeleteLog);
+              final result = await arg.confirmDialog(arg.hintDeleteLog);
               if (result == true) {
                 onDelete(file);
                 Navigator.pop(context);

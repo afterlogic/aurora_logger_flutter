@@ -11,7 +11,7 @@ dependencies:
   shared_preferences:
   path_provider:
   intl:
-  share:
+  share_plus:
 
 dev_dependencies:
   flutter_test:
