@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:aurora_logger/src/widget/logger_setting_arg.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:share_plus_platform_interface/share_plus_platform_interface.dart';
+import 'package:cross_file/cross_file.dart';
 
 class LogScreen extends StatelessWidget {
   final File file;
