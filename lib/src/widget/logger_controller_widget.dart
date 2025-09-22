@@ -1,20 +1,29 @@
-import 'package:flutter/material.dart';
 import 'package:aurora_logger/src/logger/logger.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 class LoggerControllerWidget extends StatefulWidget {
+  final double bottomPadding;
+
+  const LoggerControllerWidget({
+    this.bottomPadding = 0.0,
+  });
+
   @override
   State<StatefulWidget> createState() {
     return LoggerControllerWidgetState();
   }
 
-  static Widget wrap(Widget widget) {
+  static Widget wrap(
+    Widget widget, {
+    double bottomPadding = 0.0,
+  }) {
     return Column(
       children: <Widget>[
         Expanded(
           child: widget,
         ),
-        LoggerControllerWidget(),
+        LoggerControllerWidget(bottomPadding: bottomPadding),
       ],
     );
   }
@@ -72,57 +81,61 @@ class LoggerControllerWidgetState extends State<LoggerControllerWidget> {
     if (!logger.enable) {
       return SizedBox.shrink();
     }
+
     return Directionality(
       textDirection: TextDirection.ltr,
-      child: Container(
-        color: Colors.white,
-        height: 40,
-        width: double.infinity,
-        child: Stack(
-          children: <Widget>[
-            Row(
-              textDirection: TextDirection.ltr,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  child: Padding(
-                    padding: EdgeInsets.all(6),
-                    child: Icon(Icons.delete),
-                  ),
-                  onTap: _onDelete,
-                ),
-                GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  child: Padding(
-                    padding: EdgeInsets.all(6),
-                    child: Icon(
-                      logger.isRun
-                          ? Icons.pause_circle_filled
-                          : Icons.fiber_manual_record,
-                      color: Colors.red,
+      child: Padding(
+        padding: EdgeInsets.only(bottom: widget.bottomPadding),
+        child: Container(
+          color: Colors.white,
+          height: 40,
+          width: double.infinity,
+          child: Stack(
+            children: <Widget>[
+              Row(
+                textDirection: TextDirection.ltr,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    child: Padding(
+                      padding: EdgeInsets.all(6),
+                      child: Icon(Icons.delete),
                     ),
+                    onTap: _onDelete,
                   ),
-                  onTap: _onStartPause,
-                ),
-                GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  child: Padding(
-                    padding: EdgeInsets.all(6),
-                    child: Icon(Icons.save),
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    child: Padding(
+                      padding: EdgeInsets.all(6),
+                      child: Icon(
+                        logger.isRun
+                            ? Icons.pause_circle_filled
+                            : Icons.fiber_manual_record,
+                        color: Colors.red,
+                      ),
+                    ),
+                    onTap: _onStartPause,
                   ),
-                  onTap: _onSave,
-                )
-              ],
-            ),
-            Text(
-              "Recorded entries: ${logger.count}",
-              style: TextStyle(
-                fontSize: 9,
-                color: Colors.black,
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    child: Padding(
+                      padding: EdgeInsets.all(6),
+                      child: Icon(Icons.save),
+                    ),
+                    onTap: _onSave,
+                  )
+                ],
               ),
-            ),
-          ],
+              Text(
+                "Recorded entries: ${logger.count}",
+                style: TextStyle(
+                  fontSize: 9,
+                  color: Colors.black,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
